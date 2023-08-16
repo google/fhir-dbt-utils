@@ -12,13 +12,11 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-{%- macro age(
-  date_of_birth_field='birthDate',
-  snapshot_date=None
-) -%}
+{% macro test_find_first_of() %}
 
-  {%- set snapshot_date = fhir_dbt_utils.get_snapshot_date(snapshot_date) -%}
+    {{ dbt_unittest.assert_equals(fhir_dbt_utils.find_first_of("foobar", "f"), 0) }}
+    {{ dbt_unittest.assert_equals(fhir_dbt_utils.find_first_of("foobar", "o"), 1) }}
+    {{ dbt_unittest.assert_equals(fhir_dbt_utils.find_first_of("foobar", "br"), 3) }}
+    {{ dbt_unittest.assert_equals(fhir_dbt_utils.find_first_of("foobar", "c"), -1) }}
 
-  DATE_DIFF({{snapshot_date}}, DATE({{date_of_birth_field}}), YEAR) - IF(EXTRACT(DAYOFYEAR FROM DATE({{date_of_birth_field}})) > EXTRACT(DAYOFYEAR FROM DATE({{snapshot_date}})), 1, 0)
-
-{%- endmacro -%}
+{% endmacro %}

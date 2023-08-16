@@ -15,7 +15,7 @@
 {%- macro create_dummy_table() -%}
 
 {%- if execute -%}
-{%- set patient_reference_column = model_metadata('patient_reference_column') -%}
+{%- set patient_reference_column = fhir_dbt_utils.model_metadata('patient_reference_column') -%}
 {%- endif -%}
 
 SELECT

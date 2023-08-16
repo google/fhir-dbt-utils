@@ -18,15 +18,15 @@
 ) -%}
 
   {%- if timezone == None -%}
-    {%- set timezone = "'" ~ var('timezone_default') ~ "'" -%}
+    {%- set timezone = var('timezone_default') -%}
   {%- endif -%}
 
   IF(
     CHAR_LENGTH({{ date_field }}) = 10,
-    {{ safe_cast_as_date(date_field) }},
-    {{ date(
-      safe_cast_as_timestamp(date_field),
-      timezone)|indent(8) }}
+    {{ fhir_dbt_utils.safe_cast_as_date(date_field) }},
+    {{ fhir_dbt_utils.date(
+      fhir_dbt_utils.safe_cast_as_timestamp(date_field),
+      "'" ~ timezone ~ "'")|indent(8) }}
   )
 
 {%- endmacro -%}

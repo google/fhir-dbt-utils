@@ -23,12 +23,12 @@
 
     {#- 2nd choice: fhir_resource specified by fhir_resource key in model metadata -#}
     {%- if fhir_resource == None -%}
-      {%- set fhir_resource = model_metadata(meta_key='fhir_resource') -%}
+      {%- set fhir_resource = fhir_dbt_utils.model_metadata(meta_key='fhir_resource') -%}
     {%- endif -%}
 
     {#- 3rd choice: fhir_resource specified by primary_resource key in model metadata -#}
     {%- if fhir_resource == None -%}
-      {%- set fhir_resource = model_metadata(meta_key='primary_resource') -%}
+      {%- set fhir_resource = fhir_dbt_utils.model_metadata(meta_key='primary_resource') -%}
     {%- endif -%}
 
     {#- If no FHIR resource retrieved then raise error -#}

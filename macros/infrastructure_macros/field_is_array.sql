@@ -14,9 +14,9 @@
 
 {%- macro field_is_array(field_name, fhir_resource=None) -%}
 
-  {% set fhir_resource = get_fhir_resource(fhir_resource) %}
+  {% set fhir_resource = fhir_dbt_utils.get_fhir_resource(fhir_resource) %}
 
-  {% set datatype_dict = get_datatype_dict(fhir_resource) %}
+  {% set datatype_dict = fhir_dbt_utils.get_datatype_dict(fhir_resource) %}
 
   {% set field_is_array =
       field_name in datatype_dict

@@ -19,14 +19,14 @@
 ) -%}
 
   {%- set arrays = [
-        array_config(field = "component", unnested_alias = "c"),
-        array_config(field = "c.code.coding", unnested_alias = "cc")
+        fhir_dbt_utils.array_config(field = "component", unnested_alias = "c"),
+        fhir_dbt_utils.array_config(field = "c.code.coding", unnested_alias = "cc")
       ]
   -%}
 
-  ({{ select_from_unnest(
+  ({{ fhir_dbt_utils.select_from_unnest(
         select = "c.value." ~ return_field,
-        unnested = unnest_multiple(arrays),
+        unnested = fhir_dbt_utils.unnest_multiple(arrays),
         where = "cc.system = '" ~ code_system ~ "' AND cc.code = '" ~ code ~ "'",
         order_by = "cc.code"
       )

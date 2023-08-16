@@ -15,21 +15,21 @@
 {%- macro fhir_resource_view_expression() -%}
 
 {%- if execute -%}
-    {%- set fhir_resource = model_metadata(meta_key='fhir_resource') -%}
+    {%- set fhir_resource = fhir_dbt_utils.model_metadata(meta_key='fhir_resource') -%}
 {%- else %}
     {%- set fhir_resource = 'N/A' -%}
 {%- endif -%}
 
 {% if var('snake_case_fhir_tables') %}
-    {% set fhir_table = camel_case_to_snake_case(fhir_resource) %}
+    {% set fhir_table = fhir_dbt_utils.camel_case_to_snake_case(fhir_resource) %}
 {% else %}
     {% set fhir_table = fhir_resource %}
 {% endif %}
 
-{%- if fhir_resource_exists(fhir_resource) -%}
+{%- if fhir_dbt_utils.fhir_resource_exists(fhir_resource) -%}
 SELECT * FROM {{ source('fhir', fhir_table) }}
 {%- else %}
-{{ create_dummy_table() }}
+{{ fhir_dbt_utils.create_dummy_table() }}
 {%- endif -%}
 
 {%- endmacro -%}

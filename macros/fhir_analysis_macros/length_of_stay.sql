@@ -12,12 +12,28 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-{%- macro length_of_stay(date_part='DAY') -%}
+{%- macro length_of_stay(
+  date_part='DAY',
+  los_for_ongoing_encounters=False
+) -%}
 
-  DATE_DIFF(
-    {{ string_to_date('period.end') }},
-    {{ string_to_date('period.start') }},
-    {{date_part}}
+  {%- if los_for_ongoing_encounters == True -%}
+    {%- set snapshot_date = fhir_dbt_utils.get_snapshot_date() -%}
+
+    DATE_DIFF(
+      COALESCE( {{ fhir_dbt_utils.string_to_date('period.end') }}, {{snapshot_date}} ),
+      {{ fhir_dbt_utils.string_to_date('period.start') }},
+      {{date_part}}
   )
+
+  {%- else -%}
+
+    DATE_DIFF(
+      {{ fhir_dbt_utils.string_to_date('period.end') }},
+      {{ fhir_dbt_utils.string_to_date('period.start') }},
+      {{date_part}}
+    )
+
+  {%- endif -%}
 
 {%- endmacro -%}

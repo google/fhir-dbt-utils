@@ -17,7 +17,7 @@
   snapshot_date=None
 ) -%}
 
-  {%- set snapshot_date = get_snapshot_date(snapshot_date) -%}
+  {%- set snapshot_date = fhir_dbt_utils.get_snapshot_date(snapshot_date) -%}
 
   ({{date_of_death_field}} IS NULL OR DATE({{date_of_death_field}}) > {{snapshot_date}})
 

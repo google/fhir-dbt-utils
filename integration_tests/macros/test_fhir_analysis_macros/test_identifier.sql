@@ -12,13 +12,27 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-{%- macro age(
-  date_of_birth_field='birthDate',
-  snapshot_date=None
-) -%}
+{% macro test_identifier() %}
 
-  {%- set snapshot_date = fhir_dbt_utils.get_snapshot_date(snapshot_date) -%}
+  {% set input_data %}
+    [ STRUCT(
+        "http://hl7.org/fhir/sid/us-ssn" AS `system`,
+        "88888888" AS `value`
+      ),
+      STRUCT(
+        "http://other-identifier.org" AS `system`,
+        "55555555" AS `value`
+      )
+    ] as `identifier`
+  {% endset %}
 
-  DATE_DIFF({{snapshot_date}}, DATE({{date_of_birth_field}}), YEAR) - IF(EXTRACT(DAYOFYEAR FROM DATE({{date_of_birth_field}})) > EXTRACT(DAYOFYEAR FROM DATE({{snapshot_date}})), 1, 0)
+  {% set tests = {
+    'return_social_security_number': {
+      'test': fhir_dbt_utils.identifier("http://hl7.org/fhir/sid/us-ssn"),
+      'expect': '88888888'
+    }
+  } %}
 
-{%- endmacro -%}
+  {{ perform_tests(input_data, tests) }}
+
+{% endmacro %}

@@ -14,7 +14,7 @@
 
 {%- macro get_metric_date_columns() -%}
 
-  {% set columns = model_metadata('metric_date_columns') -%}
+  {% set columns = fhir_dbt_utils.model_metadata('metric_date_columns') -%}
   {% if not columns %}
     {{ return(None) }}
   {% endif %}

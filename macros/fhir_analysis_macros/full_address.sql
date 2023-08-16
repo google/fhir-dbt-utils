@@ -14,6 +14,6 @@
 
 {%- macro full_address() -%}
 
-  (SELECT ARRAY_TO_STRING(ARRAY_CONCAT(line, [city, state, country, postalCode]), ', ') FROM UNNEST(address) ORDER BY use = 'home' DESC LIMIT 1)
+  (SELECT ARRAY_TO_STRING(ARRAY_CONCAT(line, [city, state, postalCode, country]), ', ') FROM UNNEST(address) ORDER BY use = 'home' DESC LIMIT 1)
 
 {%- endmacro -%}

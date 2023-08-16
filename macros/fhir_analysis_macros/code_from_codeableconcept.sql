@@ -16,27 +16,32 @@
   field_name,
   code_system,
   fhir_resource=None,
-  return_field='code'
+  return_field='code',
+  is_array=None
 ) -%}
 
-  {%- set field_is_array = field_is_array(field_name, fhir_resource) -%}
+  {%- if is_array != None %}
+    {%- set field_is_array = is_array -%}
+  {%- else %}
+    {%- set field_is_array = fhir_dbt_utils.field_is_array(field_name, fhir_resource) -%}
+  {%- endif %}
 
   {%- if field_is_array %}
     {%- set arrays = [
-          array_config(field = field_name, unnested_alias = "f"),
-          array_config(field = "f.coding", unnested_alias = "c")
+          fhir_dbt_utils.array_config(field = field_name, unnested_alias = "f"),
+          fhir_dbt_utils.array_config(field = "f.coding", unnested_alias = "c")
         ]
     -%}
   {%- else %}
     {%- set arrays = [
-          array_config(field = field_name~".coding", unnested_alias = "c")
+          fhir_dbt_utils.array_config(field = field_name~".coding", unnested_alias = "c")
         ]
     -%}
   {%- endif -%}
 
-  ({{ select_from_unnest(
+  ({{ fhir_dbt_utils.select_from_unnest(
         select = "c." ~ return_field,
-        unnested = unnest_multiple(arrays),
+        unnested = fhir_dbt_utils.unnest_multiple(arrays),
         where = "c.system = '" ~ code_system ~ "'",
         order_by = "c.code"
       )
