@@ -1,0 +1,629 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#    https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+version: 2
+
+macros:
+
+# FHIR analysis macros
+
+  - name: age
+
+    description: |
+      Prints SQL to calculate a patient's age on a specific date from their date of birth, returning
+      an integer.
+
+      The date on which to calculate age is selected in the following priority order:
+
+      (1) The `snapshot_date` argument provided to this macro, if specified.
+
+      (2) The `snapshot_date` project variable, if specified.
+
+      (3) Today's date.
+
+    arguments:
+      - name: date_of_birth_field
+        type: string
+        description: |
+          Field containing the patient's date of birth. Default argument is the `birthDate` field
+          from the Patient FHIR resource.
+      - name: snapshot_date
+        type: string
+        description: Date on which to calculate patient age.
+
+
+  - name: alive
+
+    description: |
+      Prints SQL to evaluate whether a patient was alive on a given date, returning a boolean.
+
+    arguments:
+      - name: date_of_death_field
+        type: string
+        description: |
+          Field containing the patient's date of death. Default argument is the `deceased.dateTime`
+          field from the Patient FHIR resource.
+      - name: snapshot_date
+        type: string
+        description:  Date on which to evaluate whether a patient was alive.
+
+
+  - name: bucket
+
+    description: |
+      Prints SQL to group values within a numerical field into ordinal buckets, returning a string
+      denoting the bucket range (e.g. "10 - 20").
+
+    arguments:
+      - name: field
+        type: string
+        description: Field containing numerical values to be grouped.
+      - name: boundaries_array
+        type: list
+        description: |
+          List of numbers to be the boundaries for bucketing. For example, "[1, 5, 10]" would group
+          values into the following buckets: "< 1", "1 - 5", "5 - 10", ""> 10". The default is
+          [00, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].
+
+
+  - name: code_from_codeableconcept
+
+    description: |
+      Prints SQL to extract a code for a specified code system from a FHIR codeableConcept field.
+
+      If `coding.code` is not informative, then can return `coding.display` instead by setting the
+      `return_field` argument to 'display'.
+
+    arguments:
+      - name: field_name
+        type: string
+        description: |
+          FHIR field that is of type codeableConcept. If this field in an array, then the macro will
+          unnest this field.
+      - name: code_system
+        type: string
+        description: |
+          Coding system to filter the search of the codeableConcept field.
+      - name: fhir_resource
+        type: string
+        description: |
+          The FHIR resource to check whether the specified `field_name` exists. If not specified,
+          the macro will default to using the `primary_resource` speficied in the model
+          metadata.
+      - name: return_field
+        type: string
+        description: |
+          If set to 'display', the macro will return the `coding.display` field from the
+          codeableConcept. By default, `coding.code` will be returned.
+      - name: is_array
+        type: boolean
+        description: |
+          Whether the top level FHIR field (specified by the `field_name` argument) is an array. If 
+          set to True, the macro will unnest this field. If this argument is not provided, the macro
+          will determine whether the field in an array using the `field_is_array` macro. This
+          argument only needs to be provided during testing.
+
+
+  - name: full_address
+
+    description: |
+      Prints SQL for extracting a full address string from the `address` FHIR field. For example:
+      "615 Synthea Lane, Suite 4, Boston, Massachusetts, 02111, US"
+
+      The macro preferentially extracts a home address if recorded (`address.use` = "home").
+
+
+  - name: has_value
+
+    description: |
+      Prints SQL for evaluating whether a field has a value recorded, returning TRUE if it does and
+      FALSE if does not.
+
+      A field is evaluated as not recorded if it is NULL or contains a value matching any value
+      within the `null_values` list argument.
+
+    arguments:
+      - name: field_name
+        type: string
+        description: FHIR field to evaluate.
+      - name: null_values
+        type: list
+        description: |
+          List of string values considered as NULL. If `field_name` matches any of these values, the
+          SQL will return FALSE. Default; `null_values` project variable.
+
+
+  - name: identifier
+
+    description: |
+      Prints SQL to return an identifier value for a specified system from a FHIR identifier field.
+
+    arguments:
+      - name: system
+        type: string
+        description: |
+          Identifier system for which to return the identifier. For example:
+          "http://hl7.org/fhir/sid/us-ssn".
+
+
+  - name: length_of_stay
+
+    description: |
+      Prints SQL for calculating the length of stay for an encounter from the `Encounter.period`
+      FHIR field.
+
+    arguments:
+      - name: date_part
+        type: string
+        description: |
+          The date unit for which to calculate length of stay. Default; DAY. Accecpted values: DAY,
+          WEEK, MONTH, QUARTER, YEAR.
+      - name: los_for_ongoing_encounters
+        type: boolean
+        description: |
+          Whether to calculate length of stay for encounters that are still ongoing (`period.end` is
+          NULL). For such encounters, the length of stay is calculated from the `period.start` date
+          to the `snapshot_date` project variable or to today's date if `snapshot_date` is not set.
+          Default; False.
+
+
+  - name: official_name
+
+    description: Prints SQL for extracting a full official name from the `name` FHIR field.
+
+    arguments:
+      - name: include_prefix
+        type: boolean
+        description: Whether to include prefixes (e.g. "Mrs") in the returned name. Default; True.
+      - name: include_suffix
+        type: boolean
+        description: Whether to include suffixes (e.g. "Jr") in the returned name. Default; True.
+      - name: include_middle_names
+        type: boolean
+        description: Whether to include middle names in the returned name. Default; True.
+
+
+  - name: string_to_date
+
+    description: |
+      Prints SQL for returning the local date from a field containing a date or datetime stored as a
+      string. 
+
+    arguments:
+      - name: date_field
+        type: string
+        description: Field containing dates or datetimes stored as strings.
+      - name: timezone
+        type: string
+        description: |
+          The IANA time-zone name for this data. For example, "Europe/London". Defaults to the
+          `timezone_default` project variable if not set.
+
+
+  - name: value_from_component
+
+    description: Prints SQL to extract a value from the FHIR `Observation.component` field.
+
+    arguments:
+      - name: code
+        type: string
+        description: The code for which to return a value.
+      - name: code_system
+        type: string
+        description: The code system that the code specified belongs to.
+      - name: return_field
+        type: string
+        description: The value sub-field to return. Default; `quantity.value`.
+
+
+
+# FHIR view macros
+
+  - name: create_dummy_table
+
+    description: |
+      Prints a SQL select statement to create a single row table with an id field and a patient
+      reference field.
+
+      This macro is called by the `fhir_resource_view_expression` macro to create a "dummy" view
+      when no table exists for a FHIR resource. 
+
+
+  - name: fhir_resource_exists
+
+    description: |
+      Returns TRUE if a specified FHIR resource exists within the source schema defined by the
+      `database` and `schema` variables in dbt_project.yml.
+
+    arguments:
+      - name: test_fhir_resource
+        type: string
+        description: FHIR resource to evaluate in Pascal case (e.g AllergyIntolerance).
+
+
+  - name: fhir_resource_view_expression
+
+    description: Prints SQL for views over a FHIR resource.
+
+      It is used by models within the `fhir_resources` folder to generate FHIR resource views
+      (e.g Patient.sql).
+
+
+
+# Infrastructure macros
+
+  - name: field_exists
+
+    description: Returns TRUE if a specified field exists within a FHIR resource view.
+
+    arguments:
+      - name: field_name
+        type: string
+        description: |
+          Field name to evaluate. Can be a top-level field (e.g. code) or a nested column (e.g.
+          code.coding.display).
+      - name: fhir_resource
+        type: string
+        description: |
+          The FHIR resource to check whether the specified `field_name` exists.  If not specified,
+          the macro will default to using the `fhir_resource` or the `primary_resource` specified in
+          the model metadata.
+
+
+  - name: field_is_array
+
+    description: Returns TRUE is the specified field is an array data type.
+
+    arguments:
+      - name: field_name
+        type: string
+        description: FHIR field to evaluate whether it is an array.
+      - name: fhir_resource
+        type: string
+        description: |
+          FHIR resource in which `field_name` is located. If not specified, the macro will default
+          to using the `fhir_resource` or the `primary_resource` specified in the model metadata.
+
+
+  - name: get_datatype_dict
+
+    description: |
+      Returns a dictionary object containing all columns (keys) in a FHIR resource view and their
+      data types (values).
+
+      Included in the dictionary are both top-level columns (e.g. code) and nested columns (e.g
+      code.coding.display).
+
+    arguments:
+      - name: fhir_resource
+        type: string
+        description: |
+          The FHIR resource from which to return a dictionary of columns contained in the FHIR
+          resource view.
+
+          If not specified, the macro will default to using the `primary_resource` specified in the
+          model metadata.
+
+
+  - name: get_fhir_resource
+
+    description: |
+      Returns a FHIR resource name in the following priority order:
+
+      (1) The `fhir_resource` argument provided to this macro, if specified.
+
+      (2) The `fhir_resource` recorded in the model metadata config, if specified.
+
+      (3) The `primary_resource` recorded in the model metadata config, if specified.
+
+    arguments:
+      - name: fhir_resource
+        type: string
+        description: |
+          FHIR resource name to be returned by this macro if specified. For example, "Patient".
+
+
+  - name: get_metric_date_columns
+
+    description: Returns the metric date columns specified in the model metadata.
+
+
+  - name: get_snapshot_date
+
+    description: |
+      Prints SQL for returning a date in the following priority order:
+
+      (1) The `snapshot_date` argument provided to this macro, if specified.
+
+      (2) The `snapshot_date` project variable, if specified.
+
+      (3) Today's date.
+
+    arguments:
+      - name: snapshot_date
+        type: string
+        description: Date to be returned by this macro if specified.
+
+
+  - name: model_metadata
+
+    description: Returns the value for a specified key defined in a dbt model's metadata config.
+
+    arguments:
+      - name: meta_key
+        type: string
+        description: Meta key for which to return the value (e.g. primary_resource)
+      - name: model_name
+        type: string
+        description: |
+          The dbt model from which to extract the metadata value.
+
+          If not specified, the macro will default to using the model within which this macro is
+          called.
+      - name: value_if_missing
+        type: string
+        description: Default value to return when no value is returned for the specified key.
+
+
+
+# String macros
+
+  - name: camel_case_to_snake_case
+
+    description: Returns a snake_case version of a CamelCase string.
+
+    arguments:
+      - name: str
+        type: string
+        description: String in CamelCase to be converted to snake_case.
+
+
+  - name: find_first_of
+
+    description: Returns position of the first occurrence of a given list of letters in a string.
+
+    arguments:
+      - name: haystack
+        type: string
+        description: String to search through.
+
+      - name: letters
+        type: string
+        description: Letters to search for.
+
+
+  - name: quote_array
+
+    description: Returns an array with each string wrapped in single quotes.
+
+    arguments:
+      - name: x
+        type: list
+        description: List of strings to be quoted.
+
+
+  - name: snake_case_to_proper_case
+
+    description: |
+      Prints SQL for converting a snake_case column (e.g. encounter_class) to Proper Case (e.g
+      Encounter Class).
+
+    arguments:
+      - name: snake_case_column
+        type: string
+        description: Column with snake_case value to be converted to Proper Case.
+
+
+
+# Cross DB macros
+
+  - name: array_join
+
+    description: Prints SQL for creating a string by joining the `array` values by the `delimiter`.
+
+    arguments:
+      - name: array
+      - name: delimiter
+
+
+  - name: current_datetime
+
+    description: Prints SQL for returning the current date and time.
+
+
+  - name: date
+
+    description: Prints SQL for converting `expression` to a date
+    arguments:
+      - name: expression
+        type: string
+        description: SQL expression to be converted to a date.
+      - name: timezone
+        type: string
+        description: IANA time-zone name. For example, "Europe/London".
+
+
+  - name: date_add_days
+
+    description: Prints SQL for adding a specified number of `days` to `expression`
+    arguments:
+      - name: expression
+      - name: days
+
+
+  - name: error
+
+    description: Prints the SQL to fail the query with an error.
+
+    arguments:
+      - name: expression
+        type: string
+        description: Error message.
+
+
+  - name: flatten_column
+
+    description: |
+      Parses the data type and returns a list of sub-columns as structs with `name` and `data_type`
+      fields. Recursively finds all sub-columns in a nested data type.
+
+    arguments:
+      - name: column
+        type: struct with `name` and `data_type` fields
+        description: Column definition, including a structured `data_type`.
+
+
+  - name: is_spark
+
+    description: Returns `true` if the target database is Apache Spark SQL.
+
+
+  - name: safe_cast_as_date
+
+    description: Convenience function to safe_cast as date.
+
+    arguments:
+      - name: x
+        type: string
+        description: Expression to be cast as date.
+
+
+  - name: safe_cast_as_timestamp
+
+    description: Convenience function to safe_cast as timestamp.
+
+    arguments:
+      - name: x
+        type: string
+        description: Expression to be cast as timestamp.
+
+
+  - name: safe_divide
+
+    description: Prints SQL to safely divide (i.e. return NULL if dividing by zero).
+
+    arguments:
+      - name: x
+        type: string
+        description: The numerator.
+
+      - name: y
+        type: string
+        description: The denominator.
+
+
+  - name: select_from_unnest
+
+    description: |
+      Prints SQL which selects the first value from unnested arrays.
+
+    arguments:
+      - name: select
+        type: string
+        description: The field to select.
+
+      - name: unnested
+        type: number
+        description: |
+          The unnested arrays, perhaps a result of the `unnest` or `unnest_multiple` macros.
+
+      - name: where
+        type: string
+        description: |
+          The WHERE clause, can use the alias of the unnested array values.
+
+      - name: order_by
+        type: string
+        description: |
+          The ORDER BY clause, important because we select the first value.
+
+
+  - name: spark_parenthesis
+
+    description: Surrounds `s` by parenthesis on Spark, leaves as is on BigQuery.
+
+    arguments:
+      - name: s
+        type: string
+
+
+  - name: table_ref
+
+    description: Constructs a table reference. Useful when the `ref` macro can't be used.
+
+    arguments:
+      - name: database
+      - name: schema
+      - name: table
+
+
+  - name: timestamp_trunc
+
+    description: Re-implement dbt.date_trunc for BigQuery, in order to allow entering timezone.
+
+    arguments:
+      - name: datepart
+        type: string
+        description: E.g. "hour".
+
+      - name: date
+        type: string
+        description: The date expression.
+
+      - name: timezone
+        type: string
+        description: The timezone.
+
+
+  - name: type_double
+
+    description: Database specific type name for 64-bit rational number.
+
+
+  - name: type_long
+
+    description: Database specific type name for 64-bit integer.
+
+
+  - name: unnest
+
+    description: |
+      Prints SQL which unnests an array.
+
+    arguments:
+      - name: array
+        type: string
+        description: The array to unnest.
+
+      - name: alias
+        type: string
+        description: The alias for the unnested values.
+
+
+  - name: unnest_multiple
+
+    description: |
+      Prints SQL which unnests a nested array.
+
+    arguments:
+      - name: arrays
+        type: list
+        description: |
+          Configurations of the arrays to be unnested, each ideally created using the `array_config`
+          macro.
+
+
+  - name: uuid
+
+    description: Returns the SQL for UUID.

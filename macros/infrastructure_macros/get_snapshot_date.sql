@@ -18,7 +18,7 @@
   {%- if snapshot_date != None -%}
     {%- do return("DATE('" ~ snapshot_date ~ "')") -%}
 
-  {#- 2nd choice: snapshot_date specifed by project variable -#}
+  {#- 2nd choice: snapshot_date specified by project variable -#}
   {%- elif var('snapshot_date') != "None" -%}
     {%- do return("DATE('" ~ var('snapshot_date') ~ "')") -%}
 
