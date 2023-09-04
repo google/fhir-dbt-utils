@@ -48,6 +48,14 @@ macros:
     description: |
       Prints SQL to evaluate whether a patient was alive on a given date, returning a boolean.
 
+      The date on which to evaluate is selected in the following priority order:
+
+      (1) The `snapshot_date` argument provided to this macro, if specified.
+
+      (2) The `snapshot_date` project variable, if specified.
+
+      (3) Today's date.
+
     arguments:
       - name: date_of_death_field
         type: string
