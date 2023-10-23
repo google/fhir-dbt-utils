@@ -27,8 +27,10 @@ dbt --version
 # Install dbt project dependencies.
 dbt deps
 
-# Run all macro unit tests - outputs only on failure.
+# Run all macro unit tests.
+echo "Running dbt run-operation run_unit_tests"
 dbt run-operation run_unit_tests
+echo "SUCCESS: All tests are passing."
 
 # Remove artifacts on completion.
 dbt clean
