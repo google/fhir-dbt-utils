@@ -6,7 +6,7 @@
 
 ## What is FHIR-dbt-utils?
 
-FHIR-dbt-utils is a [dbt](https://docs.getdbt.com/docs/introduction) package to support analytics over [FHIR resources]((http://build.fhir.org/resourcelist.html)) stored in BigQuery or Apache Spark.
+FHIR-dbt-utils is a [dbt](https://docs.getdbt.com/docs/introduction) package to support analytics over [FHIR® resources]((http://build.fhir.org/resourcelist.html)) stored in BigQuery or Apache Spark.
 
 The package is a foundation on which advanced FHIR analytics can be built. It is predominatly a collection of dbt macros that can be used to:
 
@@ -40,3 +40,5 @@ After this, we recommend that you read through [Using The Package](readme/using_
 FHIR-dbt-utils is not an officially supported Google product. The project is work-in-progress so expect additional content to be added as well as potentially breaking changes as we refine the project structure.
 
 If you believe that something’s not working, please [create a GitHub issue](https://docs.github.com/en/issues/tracking-your-work-with-issues/creating-an-issue). We would also very much welcome any general feedback and suggestions for improvements which you can provide via this [Google form](https://docs.google.com/forms/d/e/1FAIpQLScU0WXCXA7xOX7kGr6QSW9BNMZwHswf5zq10MfRnnZJYQ6L8g/viewform).
+
+FHIR® is the registered trademark of HL7 and is used with the permission of HL7. Use of the FHIR trademark does not constitute endorsement of the contents of this repository by HL7.
