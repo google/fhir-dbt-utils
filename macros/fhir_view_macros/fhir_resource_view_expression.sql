@@ -15,21 +15,20 @@
 {%- macro fhir_resource_view_expression() -%}
 
 {%- if execute -%}
-    {%- set fhir_resource = fhir_dbt_utils.model_metadata(meta_key='fhir_resource') -%}
-{%- else %}
-    {%- set fhir_resource = 'N/A' -%}
-{%- endif -%}
 
-{% if var('snake_case_fhir_tables') %}
-    {% set fhir_table = fhir_dbt_utils.camel_case_to_snake_case(fhir_resource) %}
-{% else %}
-    {% set fhir_table = fhir_resource %}
-{% endif %}
+    {%- set fhir_resource = fhir_dbt_utils.model_metadata(meta_key='fhir_resource') -%}
+
+    {% if var('snake_case_fhir_tables') %}
+        {% set fhir_table = fhir_dbt_utils.camel_case_to_snake_case(fhir_resource) %}
+    {% else %}
+        {% set fhir_table = fhir_resource %}
+    {% endif %}
 
 {%- if target.name == "internal_pipeline"  -%}
 SELECT *
 FROM {{fhir_table}}
 {% elif not fhir_dbt_utils.fhir_resource_exists(fhir_resource) %}
+    {%- do exceptions.warn("FHIR resource " ~ fhir_table ~ " does not exist in your database. Creating a dummy view with 1 row") -%}
     {{ fhir_dbt_utils.create_dummy_table() }}
 {%- elif var('multiple_tables_per_resource') -%}
     {% set fhir_tables = fhir_dbt_utils.get_tables_for_resource(fhir_resource) %}
@@ -37,6 +36,8 @@ FROM {{fhir_table}}
 {%- else %}
 SELECT *
 FROM {{ source('fhir', fhir_table) }}
+{%- endif -%}
+
 {%- endif -%}
 
 {%- endmacro -%}

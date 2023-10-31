@@ -18,6 +18,27 @@
   include_middle_names=True
 ) -%}
 
+{#- Validate input arguments -#}
+
+  {%- set errors = [] -%}
+
+  {%- if include_prefix is not boolean -%}
+    {%- do errors.append("include_prefix argument must be a string. Got: " ~ include_prefix) -%}
+  {%- endif -%}
+
+  {%- if include_suffix is not boolean -%}
+    {%- do errors.append("include_suffix argument must be a string. Got: " ~ include_suffix) -%}
+  {%- endif -%}
+
+  {%- if include_middle_names is not boolean -%}
+    {%- do errors.append("include_middle_names argument must be a string. Got: " ~ include_middle_names) -%}
+  {%- endif -%}
+
+  {%- do exceptions.raise_compiler_error("Macro input error(s):\n" ~ errors|join('. \n')) if errors -%}
+
+
+{#- Macro logic -#}
+
   CONCAT(
   {% if include_prefix == True -%}
     (SELECT ARRAY_TO_STRING(prefix, ' ') FROM UNNEST(name) WHERE use = 'official'), ' ',

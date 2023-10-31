@@ -17,6 +17,15 @@
   timezone=None
 ) -%}
 
+{#- Validate input arguments -#}
+
+  {%- if date_field is not string -%}
+    {%- do exceptions.raise_compiler_error("Macro input error: date_field argument must be a string. Got: " ~ date_field) -%}
+  {%- endif -%}
+
+
+{#- Macro logic -#}
+
   {%- if timezone == None -%}
     {%- set timezone = var('timezone_default') -%}
   {%- endif -%}

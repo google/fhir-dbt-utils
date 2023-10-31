@@ -17,6 +17,25 @@
   los_for_ongoing_encounters=False
 ) -%}
 
+{#- Validate input arguments -#}
+
+  {%- set errors = [] -%}
+
+  {%- if date_part is not string -%}
+    {%- do errors.append("date_part argument must be a string. Got: " ~ date_part) -%}
+  {%- elif date_part not in ('DAY', 'WEEK', 'ISOWEEK', 'MONTH', 'QUARTER', 'YEAR', 'ISOYEAR') -%}
+      {{ errors.append("date_part must be one of 'DAY', 'WEEK', 'ISOWEEK', 'MONTH', 'QUARTER', 'YEAR' or 'ISOYEAR'. Got " ~ date_part) }}
+  {%- endif -%}
+
+  {%- if los_for_ongoing_encounters is not boolean -%}
+    {%- do errors.append("los_for_ongoing_encounters argument must be a boolean (True/False). Got: " ~ los_for_ongoing_encounters) -%}
+  {%- endif -%}
+
+  {%- do exceptions.raise_compiler_error("Macro input error(s):\n" ~ errors|join('. \n')) if errors -%}
+
+
+{#- Macro logic -#}
+
   {%- if los_for_ongoing_encounters == True -%}
     {%- set snapshot_date = fhir_dbt_utils.get_snapshot_date() -%}
 

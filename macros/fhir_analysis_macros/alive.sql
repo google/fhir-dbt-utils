@@ -17,6 +17,15 @@
   snapshot_date=None
 ) -%}
 
+{#- Validate input arguments -#}
+
+  {%- if date_of_death_field is not string -%}
+    {%- do exceptions.raise_compiler_error("Macro input error: date_of_death_field argument must be a string. Got: " ~ date_of_death_field) -%}
+  {%- endif -%}
+
+
+{#- Macro logic -#}
+
   {%- set snapshot_date = fhir_dbt_utils.get_snapshot_date(snapshot_date) -%}
 
   ({{date_of_death_field}} IS NULL OR DATE({{date_of_death_field}}) > {{snapshot_date}})

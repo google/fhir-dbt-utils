@@ -17,6 +17,15 @@
   snapshot_date=None
 ) -%}
 
+{#- Validate input arguments -#}
+
+  {%- if date_of_birth_field is not string -%}
+    {%- do exceptions.raise_compiler_error("Macro input error: birthDate argument must be a string. Got: " ~ date_of_birth_field) -%}
+  {%- endif -%}
+
+
+{#- Macro logic -#}
+
   {%- set snapshot_date = fhir_dbt_utils.get_snapshot_date(snapshot_date) -%}
 
   DATE_DIFF({{snapshot_date}}, DATE({{date_of_birth_field}}), YEAR) - IF(EXTRACT(DAYOFYEAR FROM DATE({{date_of_birth_field}})) > EXTRACT(DAYOFYEAR FROM DATE({{snapshot_date}})), 1, 0)

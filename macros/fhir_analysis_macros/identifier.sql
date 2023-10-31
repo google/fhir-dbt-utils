@@ -14,6 +14,15 @@
 
 {%- macro identifier(system) -%}
 
+{#- Validate input arguments -#}
+
+  {%- if system is not string -%}
+    {%- do exceptions.raise_compiler_error("Macro input error: system argument must be a string. Got: " ~ system) -%}
+  {%- endif -%}
+
+
+{#- Macro logic -#}
+
   (SELECT value FROM UNNEST(identifier) WHERE system = '{{system}}')
 
 {%- endmacro -%}

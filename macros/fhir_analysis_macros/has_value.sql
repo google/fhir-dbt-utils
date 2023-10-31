@@ -16,6 +16,16 @@
   field_name,
   null_values=var('null_values')
 ) -%}
+
+{#- Validate input arguments -#}
+
+  {%- if field_name is not string -%}
+    {%- do exceptions.raise_compiler_error("Macro input error: field_name argument must be a string. Got: " ~ field_name) -%}
+  {%- endif -%}
+
+
+{#- Macro logic -#}
+
     {{field_name}} IS NOT NULL
   {%- if null_values|length > 0 %}
     AND {{field_name}} NOT IN ('{{null_values|join("', '")}}')

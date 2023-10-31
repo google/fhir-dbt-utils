@@ -17,6 +17,15 @@
   boundaries_array=[00, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
 ) -%}
 
+{#- Validate input arguments -#}
+
+  {%- if boundaries_array is not iterable -%}
+    {%- do exceptions.raise_compiler_error("Macro input error: boundaries_array argument must be an array (e.g. [10, 20]). Got: " ~ boundaries_array) -%}
+  {%- endif -%}
+
+
+{#- Macro logic -#}
+
   CASE RANGE_BUCKET({{field}}, {{boundaries_array}})
     WHEN 0 THEN '< {{boundaries_array[0]}}'
   {% for i in range(1, boundaries_array|length) -%}

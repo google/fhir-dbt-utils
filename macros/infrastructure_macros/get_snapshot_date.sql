@@ -14,6 +14,15 @@
 
 {% macro get_snapshot_date(snapshot_date=None)-%}
 
+{#- Validate input arguments -#}
+
+  {%- if snapshot_date != None and snapshot_date is not string -%}
+    {%- do exceptions.raise_compiler_error("Macro input error: snapshot_date argument must be a string. Got: " ~ snapshot_date) -%}
+  {%- endif -%}
+
+
+{#- Macro logic -#}
+
   {#- 1st choice: snapshot_date argument provided in model -#}
   {%- if snapshot_date != None -%}
     {%- do return("DATE('" ~ snapshot_date ~ "')") -%}

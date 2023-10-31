@@ -18,6 +18,29 @@
   return_field='quantity.value'
 ) -%}
 
+{#- Validate input arguments -#}
+
+  {%- set errors = [] -%}
+
+  {%- if code is not string -%}
+    {%- do errors.append("code argument must be a string. Got: " ~ code) -%}
+  {%- endif -%}
+
+  {%- if code_system is not string -%}
+    {%- do errors.append("code_system argument must be a string. Got: " ~ code_system) -%}
+  {%- endif -%}
+
+  {%- if return_field is not string -%}
+    {%- do errors.append("return_field argument must be a string. Got: " ~ return_field) -%}
+  {%- elif return_field not in ('quantity.value', 'string', 'boolean', 'integer', 'time', 'dateTime') -%}
+      {{ errors.append("return_field must be one of 'quantity.value', 'string', 'boolean', 'integer', 'time' or 'dateTime'. Got " ~ return_field) }}
+  {%- endif -%}
+
+  {%- do exceptions.raise_compiler_error("Macro input error(s):\n" ~ errors|join('. \n')) if errors -%}
+
+
+{#- Macro logic -#}
+
   {%- set arrays = [
         fhir_dbt_utils.array_config(field = "component", unnested_alias = "c"),
         fhir_dbt_utils.array_config(field = "c.code.coding", unnested_alias = "cc")

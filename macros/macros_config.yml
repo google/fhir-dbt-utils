@@ -392,22 +392,29 @@ macros:
 
   - name: model_metadata
 
-    description: Returns the value for a specified key defined in a dbt model's metadata config.
+    description: |
+      Returns the value for a specified key defined in the current dbt model's metadata config.
 
     arguments:
       - name: meta_key
         type: string
         description: Meta key for which to return the value (e.g. primary_resource)
-      - name: model_name
-        type: string
-        description: |
-          The dbt model from which to extract the metadata value.
-
-          If not specified, the macro will default to using the model within which this macro is
-          called.
       - name: value_if_missing
         type: string
         description: Default value to return when no value is returned for the specified key.
+
+
+  - name: validate_fhir_resource_name
+
+    description: |
+      Raises compiler error exception if fhir_resourse argument is not a valid FHIR resource written
+      in Pascal Case (e.g. AllergyIntolerance). See list of FHIR resources:
+      https://build.fhir.org/resourcelist.html.
+
+    arguments:
+      - name: fhir_resource
+        type: string
+        description: FHIR resource name to check.
 
 
   - name: raw_tables_to_relations

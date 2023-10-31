@@ -18,17 +18,17 @@
         {{ return (True) }}
     {%- endif -%}
 
-    {# Query all available FHIR resources #}
-    {% set resource_list =
-        dbt_utils.get_column_values(table=ref('fhir_table_list'), column='fhir_resource') %}
+  {# Query all available FHIR resources #}
+  {% set resource_list =
+      dbt_utils.get_column_values(table=ref('fhir_table_list'), column='fhir_resource') %}
 
-    {# Check for resource of interest #}
-    {% for resource in resource_list %}
-       {% if resource == test_fhir_resource %}
-          {{ return(True) }}
-       {% endif %}
-    {% endfor %}
+  {# Check for resource of interest #}
+  {% for resource in resource_list %}
+     {% if resource == test_fhir_resource %}
+        {{ return(True) }}
+     {% endif %}
+  {% endfor %}
 
-    {{ return(False) }}
+  {{ return(False) }}
 
 {% endmacro %}

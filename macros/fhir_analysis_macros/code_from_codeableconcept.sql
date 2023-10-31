@@ -20,6 +20,37 @@
   is_array=None
 ) -%}
 
+{#- Validate input arguments -#}
+
+  {%- set errors = [] -%}
+
+  {%- if field_name is not string -%}
+    {%- do errors.append("field_name argument must be a string. Got: " ~ field_name) -%}
+  {%- endif -%}
+
+  {%- if code_system is not string -%}
+    {%- do errors.append("code_system argument must be a string. Got: " ~ code_system) -%}
+  {%- endif -%}
+
+  {%- if fhir_resource != None and fhir_resource is not string -%}
+    {%- do errors.append("fhir_resource argument must be a string. Got: " ~ fhir_resource) -%}
+  {%- endif -%}
+
+  {%- if return_field is not string -%}
+    {%- do errors.append("return_field argument must be a string. Got: " ~ return_field) -%}
+  {%- elif return_field not in ('code', 'display') -%}
+    {%- do errors.append("return_field must be one of 'code' or 'display'. Got " ~ return_field) -%}
+  {%- endif -%}
+
+  {%- if is_array != None and is_array is not boolean -%}
+    {%- do errors.append("is_array argument must be a boolean (True/False). Got: " ~ is_array) -%}
+  {%- endif -%}
+
+  {%- do exceptions.raise_compiler_error("Macro input error(s):\n" ~ errors|join('. \n')) if errors -%}
+
+
+{#- Macro logic -#}
+
   {%- if is_array != None %}
     {%- set field_is_array = is_array -%}
   {%- else %}

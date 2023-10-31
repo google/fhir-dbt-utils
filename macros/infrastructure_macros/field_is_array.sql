@@ -14,6 +14,23 @@
 
 {%- macro field_is_array(field_name, fhir_resource=None) -%}
 
+{#- Validate input arguments -#}
+
+  {%- set errors = [] -%}
+
+  {%- if field_name is not string -%}
+    {%- do errors.append("field_name argument must be a string. Got: " ~ field_name) -%}
+  {%- endif -%}
+
+  {%- if fhir_resource != None and fhir_resource is not string -%}
+    {%- do errors.append("fhir_resource argument must be a string. Got: " ~ fhir_resource) -%}
+  {%- endif -%}
+
+  {%- do exceptions.raise_compiler_error("Macro input error(s):\n" ~ errors|join('. \n')) if errors -%}
+
+
+{#- Macro logic -#}
+
   {% set fhir_resource = fhir_dbt_utils.get_fhir_resource(fhir_resource) %}
 
   {% set datatype_dict = fhir_dbt_utils.get_datatype_dict(fhir_resource) %}

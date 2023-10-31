@@ -12,10 +12,41 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-{% macro model_metadata(meta_key, model_name=this.name, value_if_missing=None) %}
+{% macro model_metadata(meta_key, value_if_missing=None) %}
 
-  {% set meta_value = model.config.meta[meta_key] %}
-  {% do return(meta_value if meta_value else value_if_missing) %}
+{#- Validate input arguments -#}
+
+  {%- set errors = [] -%}
+
+  {%- if meta_key is not string -%}
+    {%- do errors.append("meta_key argument must be a string. Got: " ~ meta_key) -%}
+  {%- endif -%}
+
+  {%- if value_if_missing != None and value_if_missing is not string -%}
+    {%- do errors.append("value_if_missing argument must be a string. Got: " ~ value_if_missing) -%}
+  {%- endif -%}
+
+  {%- do exceptions.raise_compiler_error("Macro input error(s):\n" ~ errors|join('. \n')) if errors -%}
+
+
+{#- Macro logic -#}
+
+  {%- if execute -%}
+
+    {% set meta_value = model.config.meta[meta_key] %}
+
+    {% if not meta_value %}
+
+      {%- do exceptions.warn("Value not found for key in model metadata") -%}
+      {%- do return(value_if_missing) -%}
+
+    {% else %}
+
+      {% do return(meta_value) %}
+
+    {% endif %}
+
+  {% endif %}
 
 {% endmacro %}
 

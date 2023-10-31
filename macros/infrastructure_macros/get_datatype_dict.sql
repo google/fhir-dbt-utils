@@ -14,6 +14,15 @@
 
 {% macro get_datatype_dict(fhir_resource) %}
 
+{#- Validate input arguments -#}
+
+  {%- if fhir_resource is not string -%}
+    {%- do exceptions.raise_compiler_error("Macro input error: fhir_resource argument must be a string. Got: " ~ fhir_resource) -%}
+  {%- endif -%}
+
+
+{#- Macro logic -#}
+
   {%- if execute -%}
 
     {%- set relation = adapter.get_relation(
