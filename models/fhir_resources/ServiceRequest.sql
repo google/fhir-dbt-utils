@@ -21,8 +21,7 @@
       "fhir_resource": "ServiceRequest",
       "metric_date_columns": ["authoredOn"],
       "patient_reference_column": "subject"
-      },
-    materialized = 'view'
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}

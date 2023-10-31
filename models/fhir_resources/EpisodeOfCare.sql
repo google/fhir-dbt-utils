@@ -15,12 +15,12 @@
 -- depends_on: {{ ref('fhir_table_list') }}
 
 {{- config(
-    name = "DiagnosticReport",
+    name = "EpisodeOfCare",
     meta = {
-      "description": "View of DiagnosticReport FHIR resource",
-      "fhir_resource": "DiagnosticReport",
-      "metric_date_columns": ["issued"],
-      "patient_reference_column": "subject"
+      "description": "Union of all EpisodeOfCare FHIR resources",
+      "fhir_resource": "EpisodeOfCare",
+      "metric_date_columns": ["period.start"],
+      "patient_reference_column": "patient"
       }
 ) -}}
 

@@ -21,8 +21,7 @@
       "fhir_resource": "MedicationStatement",
       "metric_date_columns": ["dateAsserted"],
       "patient_reference_column": "subject"
-      },
-    materialized = 'view'
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}

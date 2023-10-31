@@ -21,8 +21,7 @@
       "fhir_resource": "AllergyIntolerance",
       "metric_date_columns": ["recordedDate"],
       "patient_reference_column": "patient"
-      },
-    materialized = 'view'
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}

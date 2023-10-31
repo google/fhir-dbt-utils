@@ -21,8 +21,7 @@
       "fhir_resource": "MedicationAdministration",
       "metric_date_columns": ["effective.period.start", "effective.dateTime"],
       "patient_reference_column": "subject"
-      },
-    materialized = 'view'
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}

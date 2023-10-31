@@ -14,6 +14,10 @@
 
 {%- macro field_exists(field_name, fhir_resource=None) -%}
 
+  {%- if var('assume_fields_exist') -%}
+    {% do return (True) %}
+  {%- endif -%}
+
   {% set fhir_resource = fhir_dbt_utils.get_fhir_resource(fhir_resource) %}
 
   {% set datatype_dict = fhir_dbt_utils.get_datatype_dict(fhir_resource) %}

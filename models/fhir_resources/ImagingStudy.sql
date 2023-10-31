@@ -21,8 +21,7 @@
       "fhir_resource": "ImagingStudy",
       "metric_date_columns": ["started"],
       "patient_reference_column": "subject"
-      },
-    materialized = 'view'
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}

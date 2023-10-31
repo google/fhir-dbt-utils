@@ -31,6 +31,7 @@ sources:
       - name: DiagnosticReport
       - name: DocumentReference
       - name: Encounter
+      - name: EpisodeOfCare
       - name: ExplanationOfBenefit
       - name: ImagingStudy
       - name: Immunization
@@ -59,6 +60,8 @@ sources:
       - name: diagnostic_report
       - name: document_reference
       - name: encounter
+      - name: episode_of_care
+      - name: explanation_of_benefit
       - name: imaging_study
       - name: immunization
       - name: location

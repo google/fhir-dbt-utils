@@ -26,10 +26,17 @@
     {% set fhir_table = fhir_resource %}
 {% endif %}
 
-{%- if fhir_dbt_utils.fhir_resource_exists(fhir_resource) -%}
-SELECT * FROM {{ source('fhir', fhir_table) }}
+{%- if target.name == "internal_pipeline"  -%}
+SELECT *
+FROM {{fhir_table}}
+{% elif not fhir_dbt_utils.fhir_resource_exists(fhir_resource) %}
+    {{ fhir_dbt_utils.create_dummy_table() }}
+{%- elif var('multiple_tables_per_resource') -%}
+    {% set fhir_tables = fhir_dbt_utils.get_tables_for_resource(fhir_resource) %}
+    {{ return(fhir_dbt_utils.build_union_query(fhir_tables)) }}
 {%- else %}
-{{ fhir_dbt_utils.create_dummy_table() }}
+SELECT *
+FROM {{ source('fhir', fhir_table) }}
 {%- endif -%}
 
 {%- endmacro -%}

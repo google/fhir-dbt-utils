@@ -21,8 +21,7 @@
       "fhir_resource": "Organization",
       "metric_date_columns": None,
       "patient_reference_column": None
-      },
-    materialized = 'view'
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}

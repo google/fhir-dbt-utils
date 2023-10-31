@@ -21,8 +21,7 @@
       "fhir_resource": "CareTeam",
       "metric_date_columns": ["period.start"],
       "patient_reference_column": "subject"
-      },
-    materialized = 'view'
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}

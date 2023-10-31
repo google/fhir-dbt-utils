@@ -12,16 +12,17 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
--- depends_on: {{ ref('fhir_table_list') }}
+{% macro raw_tables_to_relations(input_tables) %}
 
-{{- config(
-    name = "DiagnosticReport",
-    meta = {
-      "description": "View of DiagnosticReport FHIR resource",
-      "fhir_resource": "DiagnosticReport",
-      "metric_date_columns": ["issued"],
-      "patient_reference_column": "subject"
-      }
-) -}}
+    {# Initialise array #}
+    {% set relationArray = [] %}
 
-{{ fhir_resource_view_expression() -}}
+    {# Append relations based on raw config and table names #}
+    {% for input_table in input_tables %}
+        {{ relationArray.append(api.Relation.create(
+               database=var('database'), schema=var('schema'), identifier=input_table)) }}
+    {% endfor %}
+
+    {{ return(relationArray) }}
+
+{% endmacro %}

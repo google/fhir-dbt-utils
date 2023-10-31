@@ -29,7 +29,11 @@
        and node.path.startswith(path_prefix)
        and not node.path.endswith('_view.sql') %}
     {%- set fhir_resource = node.path[path_prefix|length : -4] %}
-    {%- set table_name = get_source_table_name(fhir_resource) %}
+    {% if var('snake_case_fhir_tables') %}
+        {%- set table_name = fhir_dbt_utils.camel_case_to_snake_case(fhir_resource) %}
+    {% else %}
+        {%- set table_name = fhir_resource %}
+    {% endif %}
     {%- if adapter.get_relation(
       database = var('database'),
       schema = var('schema'),
@@ -56,7 +60,21 @@ SELECT
   table_schema as bq_dataset,
   table_name as bq_table,
   CONCAT('`', table_catalog, '`.`', table_schema, '`.`', table_name, '`') AS fully_qualified_bq_table,
+  {%- if var('multiple_tables_per_resource') -%}
+  {#- Note that this block supports a specific table naming convention so may need updating to work with your data -#}
+  SPLIT(table_name, '_')[SAFE_OFFSET(0)] AS fhir_resource,
+  REGEXP_REPLACE(table_name, r'(_[0-9]{8,})+.*', '') AS map_name,
+  IF(1 = ROW_NUMBER() OVER (
+    PARTITION BY REGEXP_REPLACE(table_name, r'(_[0-9]{8,})+.*', '')
+    ORDER BY
+      IF(table_name LIKE '%golden', 1, 0) DESC,
+      creation_time DESC
+  ), 1, 0) AS latest_version,
+  {%- else %}
   REPLACE(INITCAP(table_name), '_', '') AS fhir_resource,
+  NULL AS map_name,
+  1 AS latest_version,
+  {%- endif -%}
   creation_time
 FROM `{{ var('database') }}`.`{{ var('schema') }}`.INFORMATION_SCHEMA.TABLES
 

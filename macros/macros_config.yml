@@ -271,6 +271,19 @@ macros:
 
 # Infrastructure macros
 
+  - name: build_union_query
+
+    description: |
+      Prints SQL for a unioned view of all input tables, returning the superset of columns from all
+      tables.
+
+    arguments:
+      - name: tables
+        type: list
+        description: |
+          Array of BigQuery table names.
+
+
   - name: field_exists
 
     description: Returns TRUE if a specified field exists within a FHIR resource view.
@@ -364,6 +377,19 @@ macros:
         description: Date to be returned by this macro if specified.
 
 
+  - name: get_tables_for_resource
+
+    description: |
+      Returns an array of BigQuery table names for a FHIR resource by querying `fhir_table_list` and
+      filtering to the resource of interest. If no tables exist then a dummy array is returned.
+
+    arguments:
+      - name: fhir_resource
+        type: string
+        description: |
+          FHIR resource for which to return array of BigQuery table names (e.g. AllergyIntolerance).
+
+
   - name: model_metadata
 
     description: Returns the value for a specified key defined in a dbt model's metadata config.
@@ -382,6 +408,22 @@ macros:
       - name: value_if_missing
         type: string
         description: Default value to return when no value is returned for the specified key.
+
+
+  - name: raw_tables_to_relations
+
+    description: |
+      Returns an array of [dbt relations](https://docs.getdbt.com/reference/dbt-classes#relation)
+      for a list of table names.
+
+      The macro will search for the existence of the tables within the source schema defined by the
+      `database` and `schema` variables in dbt_project.yml.
+
+    arguments:
+      - name: input_tables
+        type: list
+        description: |
+          List of table names
 
 
 

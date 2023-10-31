@@ -23,11 +23,27 @@ clean-targets: [target, dbt_packages, logs]
 # Project variables
 
 vars:
-  organization: "Synthea"  # Name of the organization or business unit which owns the FHIR data. Used for titles in the analytics reports. [string]
+
+  # FHIR data location
   database: "bigquery-public-data"  # Name of the Google Cloud project that contains the BigQuery data. Used to connect to your FHIR data. [string]
   schema: "fhir_synthea"  # Name of the BigQuery dataset storing the FHIR data. Used to connect to your FHIR data. [string]
+
+  # FHIR data format
   fhir_version: "STU3"  # Version of FHIR that your data conforms to. [string]
   snake_case_fhir_tables: TRUE  # TRUE if your FHIR database tables are in snake case (e.g. allergy_intolerance). [boolean]
+  multiple_tables_per_resource: FALSE  # TRUE if your database can contain more than one table per FHIR resources which should be unioned. [boolean]
+  assume_resources_exist: FALSE  # TRUE if you want to always assume that FHIR resources exist in your database rather than relying on logic within the fhir_resource_exists macro. [boolean]
+  assume_fields_exist: FALSE  # TRUE if you want to always assume that fields exists in a FHIR resource rather than relying on logic within the field_exists macro. [boolean]
+
+  # Default values
   timezone_default: "America/New_York"  # Default time zone for this dataset. The IANA time-zone name. For example, "Europe/London". [string]
   null_values: []  # List of string values to be considered as missing data when evaluating whether a field is recorded by has_value macro. [list]
-  snapshot_date: None  # Date on which to evaluate patient membership of cohort. If not set, the default will evaluate membership as of today using CURRENT_DATE(). Use format: "YYYY-MM-DD". [string]
+  snapshot_date: "2023-01-01"  # Date on which to evaluate patient membership of cohort. If not set, the default will evaluate membership as of today using CURRENT_DATE(). Use format: "YYYY-MM-DD". [string]
+
+models:
+  fhir_dbt_utils:
+    fhir_resources:
+      +materialized: |
+        {%- if target.name == "internal_pipeline" -%} ephemeral
+        {%- else -%} view
+        {%- endif -%}

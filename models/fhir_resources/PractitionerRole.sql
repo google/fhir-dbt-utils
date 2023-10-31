@@ -21,8 +21,7 @@
       "fhir_resource": "PractitionerRole",
       "metric_date_columns": ["period.start"],
       "patient_reference_column": None
-      },
-    materialized = 'view'
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}

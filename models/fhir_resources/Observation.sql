@@ -21,8 +21,7 @@
       "fhir_resource": "Observation",
       "metric_date_columns": ["effective.dateTime"],
       "patient_reference_column": "subject"
-      },
-    materialized = 'view'
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}

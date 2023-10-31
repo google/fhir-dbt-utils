@@ -12,23 +12,21 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-{%- macro fhir_resource_exists(test_fhir_resource) -%}
+{% macro get_tables_for_resource(fhir_resource) %}
 
-    {%- if var('assume_resources_exist') -%}
-        {{ return (True) }}
-    {%- endif -%}
+    {# Build query to check for all tables of a certain FHIR resource #}
+    {%- call statement('result', fetch_result=True) -%}
+    SELECT DISTINCT bq_table
+    FROM {{ ref('fhir_table_list') }} AS L
+    WHERE fhir_resource = '{{ fhir_resource }}'
+    AND latest_version = 1
+    {%- endcall -%}
 
-    {# Query all available FHIR resources #}
-    {% set resource_list =
-        dbt_utils.get_column_values(table=ref('fhir_table_list'), column='fhir_resource') %}
-
-    {# Check for resource of interest #}
-    {% for resource in resource_list %}
-       {% if resource == test_fhir_resource %}
-          {{ return(True) }}
-       {% endif %}
-    {% endfor %}
-
-    {{ return(False) }}
+    {# Return result, or dummy array of ['Observation'] if result is empty #}
+    {% if execute %}
+        {{ return(load_result('result').table.columns[0].values()) }}
+    {% else %}
+        {{ return(['Observation']) }}
+    {% endif %}
 
 {% endmacro %}

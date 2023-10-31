@@ -21,8 +21,7 @@
       "fhir_resource": "Procedure",
       "metric_date_columns": ["performed.period.start", "performed.dateTime"],
       "patient_reference_column": "subject"
-      },
-    materialized = 'view'
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}

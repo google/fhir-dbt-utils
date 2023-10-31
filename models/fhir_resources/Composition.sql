@@ -21,8 +21,7 @@
       "fhir_resource": "Composition",
       "metric_date_columns": ["date"],
       "patient_reference_column": "subject"
-      },
-    materialized = 'view'
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}
