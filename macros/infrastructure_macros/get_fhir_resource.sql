@@ -20,7 +20,9 @@
     {%- do exceptions.raise_compiler_error("Macro input error: fhir_resource argument must be a string. Got: " ~ fhir_resource) -%}
   {%- endif -%}
 
-  {%- do validate_fhir_resource_name(fhir_resource) -%}
+  {%- if fhir_resource != None -%}
+  {%- do fhir_dbt_utils.validate_fhir_resource_name(fhir_resource) -%}
+  {%- endif -%}
 
 
 {#- Macro logic -#}

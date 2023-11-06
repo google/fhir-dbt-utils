@@ -12,21 +12,18 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-{%- macro create_dummy_table() -%}
-
-{%- if execute -%}
-{%- set patient_reference_column = fhir_dbt_utils.model_metadata('patient_reference_column') -%}
+{% macro local_date(date_column, date_column_data_type) -%}
+{%- if date_column_data_type == 'TIMESTAMP' -%}
+    {{ fhir_dbt_utils.date(
+      date_column,
+      "var('timezone_default')" ) }}
+{%- else -%}
+    IF(
+      CHAR_LENGTH({{ date_column }}) = 10,
+      {{ fhir_dbt_utils.safe_cast_as_date(date_column) }},
+      {{ fhir_dbt_utils.date(
+        fhir_dbt_utils.safe_cast_as_timestamp(date_column),
+        "var('timezone_default')" ) }}
+    )
 {%- endif -%}
-
-SELECT
-  CAST(NULL AS STRING) AS id,
-{%- if patient_reference_column == "link[].target" %}
-  {{ dbt.array_construct(["STRUCT(STRUCT('no_data' AS patientId) AS target)"]) }} AS link,
-{%- elif patient_reference_column != None %}
-  STRUCT('no_data' AS patientId) AS {{patient_reference_column}},
-{%- endif %}
-  CAST(NULL AS STRING) AS fhir_mapping,
-  CAST(NULL AS DATE) AS metric_date,
-  CAST(NULL AS TIMESTAMP) AS metric_hour
-
 {%- endmacro -%}

@@ -19,14 +19,9 @@
   {%- set errors = [] -%}
 
   {%- if meta_key is not string -%}
-    {%- do errors.append("meta_key argument must be a string. Got: " ~ meta_key) -%}
-  {%- endif -%}
+    {%- do exceptions.raise_compiler_error("meta_key argument must be a string. Got: " ~ meta_key) -%}
 
-  {%- if value_if_missing != None and value_if_missing is not string -%}
-    {%- do errors.append("value_if_missing argument must be a string. Got: " ~ value_if_missing) -%}
   {%- endif -%}
-
-  {%- do exceptions.raise_compiler_error("Macro input error(s):\n" ~ errors|join('. \n')) if errors -%}
 
 
 {#- Macro logic -#}

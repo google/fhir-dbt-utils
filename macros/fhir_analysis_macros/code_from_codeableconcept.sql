@@ -17,6 +17,7 @@
   code_system,
   fhir_resource=None,
   return_field='code',
+  return_int=False,
   is_array=None
 ) -%}
 
@@ -51,11 +52,32 @@
 
 {#- Macro logic -#}
 
+  {#- Validate that the field is a codeableConcept -#}
+
+  {%- set fhir_resource = fhir_dbt_utils.get_fhir_resource(fhir_resource) -%}
+  {%- set datatype_dict = fhir_dbt_utils.get_datatype_dict(fhir_resource) -%}
+
+  {%- if execute
+    and var('assume_fields_exist') == False
+    and (
+        field_name~'.coding.code' not in datatype_dict or
+        field_name~'.coding.system' not in datatype_dict
+      )
+  -%}
+    {{ return(0) if return_int else return("'missing_or_invalid_codeableconcept_field: "~field_name~"'") }}
+  {%- endif -%}
+
+
+  {#- Identify whether the field is an array -#}
+
   {%- if is_array != None %}
     {%- set field_is_array = is_array -%}
   {%- else %}
-    {%- set field_is_array = fhir_dbt_utils.field_is_array(field_name, fhir_resource) -%}
+    {%- set field_is_array = fhir_dbt_utils.field_is_array(field_name) -%}
   {%- endif %}
+
+
+  {#- Construct SQL -#}
 
   {%- if field_is_array %}
     {%- set arrays = [

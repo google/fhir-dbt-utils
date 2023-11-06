@@ -121,6 +121,11 @@ macros:
           set to True, the macro will unnest this field. If this argument is not provided, the macro
           will determine whether the field in an array using the `field_is_array` macro. This
           argument only needs to be provided during testing.
+      - name: return_int
+        type: boolean
+        description: |
+          If set to True, the macro will return an integer flag for whether a code exists, rather
+          than the code or display value itself.
 
 
   - name: full_address
@@ -184,6 +189,74 @@ macros:
           NULL). For such encounters, the length of stay is calculated from the `period.start` date
           to the `snapshot_date` project variable or to today's date if `snapshot_date` is not set.
           Default; False.
+
+
+  - name: local_date
+
+    description: |
+      Prints SQL for returning the local date from a FHIR field.
+
+    arguments:
+      - name: date_field
+        type: string
+        description: |
+          Field to use to derive the metric date.
+      - name: date_field_data_type
+        type: string
+        description: |
+          The datatype of `date_field`.
+
+
+  - name: local_hour
+
+    description: |
+      Prints SQL for returning the local hour from a FHIR field.
+
+    arguments:
+      - name: date_field
+        type: string
+        description: |
+          Field to use to derive the metric date.
+      - name: date_field_data_type
+        type: string
+        description: |
+          The datatype of `date_field`.
+
+
+  - name: metric_date
+
+    description: |
+      Prints SQL for returning the local date from an ordered list of FHIR fields.
+
+      It is used for returning the most clinically-relevant local date for a given FHIR resource.
+
+    arguments:
+      - name: metric_date_fields
+        type: list
+        description: |
+          Ordered list of fields to use to derive the metric date.
+      - name: date_field_data_type
+        type: string
+        description: |
+          The datatype of `metric_date_fields`.
+
+
+  - name: metric_hour
+
+    description: |
+      Prints SQL for returning the local hour from an ordered list of FHIR fields.
+
+      It is used for returning the most clinically-relevant local hour for a given FHIR resource.
+
+    arguments:
+      - name: metric_date_fields
+        type: list
+        description: |
+          Ordered list of fields to use to derive the metric date.
+      - name: date_field_data_type
+        type: string
+        description: |
+          The datatype of `metric_date_fields`.
 
 
   - name: official_name
@@ -335,6 +408,23 @@ macros:
 
           If not specified, the macro will default to using the `primary_resource` specified in the
           model metadata.
+
+
+  - name: get_dbt_objects
+
+    description: |
+      Returns a dictionary containing all objects in the dbt project as documented in the dbt graph.
+      The dictionary keys are the object names (e.g "metric") and the values are the paths for the
+      object in the project (e.g. "post_processing/metric.sql")
+
+    arguments:
+      - name: resource_type
+        type: string
+        description: |
+          Filter the dbt objects returned in the dictionary to a specific type (e.g. "model",
+          "macro", "seed").
+
+          If not specified, the macro will return all object types.
 
 
   - name: get_fhir_resource

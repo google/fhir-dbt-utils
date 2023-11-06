@@ -26,8 +26,8 @@
   {%- if execute -%}
 
     {%- set relation = adapter.get_relation(
-          database = this.project,
-          schema = this.schema,
+          database = target.project,
+          schema = target.schema,
           identifier = fhir_resource
         )
     -%}
@@ -42,7 +42,7 @@
     {%- set columns = adapter.get_columns_in_relation(relation) -%}
     {% for top_level_column in columns %}
       {%- do column_dict.update({top_level_column.name: top_level_column.data_type}) -%}
-      {% for column in flatten_column(top_level_column) %}
+      {% for column in fhir_dbt_utils.flatten_column(top_level_column) %}
         {%- do column_dict.update({column.name: column.data_type}) -%}
       {% endfor %}
     {%- endfor -%}
