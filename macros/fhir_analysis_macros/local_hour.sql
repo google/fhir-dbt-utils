@@ -13,11 +13,14 @@
 -- limitations under the License.
 
 {% macro local_hour(date_column, date_column_data_type) -%}
+
+{%- set timezone = "'" ~ var('timezone_default') ~ "'" -%}
+
 {%- if date_column_data_type == 'TIMESTAMP' -%}
     {{ fhir_dbt_utils.timestamp_trunc(
         "hour",
         date_column,
-        "var('timezone_default')" ) }}
+        timezone ) }}
 {%- else -%}
     IF(
       CHAR_LENGTH({{ date_column }}) = 10,
@@ -25,7 +28,8 @@
       {{ fhir_dbt_utils.timestamp_trunc(
           "hour",
           fhir_dbt_utils.safe_cast_as_timestamp(date_column),
-          "var('timezone_default')" ) }}
+          timezone ) }}
     )
 {%- endif -%}
+
 {%- endmacro -%}
