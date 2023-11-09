@@ -66,7 +66,9 @@ SELECT
   {%- endfor -%}
 
   {#- Add additional derived columns to the view #}
-    '{{ relation.identifier }}' AS fhir_mapping
+    '{{ relation.identifier }}' AS fhir_mapping,
+    {{ fhir_dbt_utils.metric_date(metric_date_columns, column_superset[metric_date_columns]) }} AS metric_date,
+    {{ fhir_dbt_utils.metric_hour(metric_date_columns, column_superset[metric_date_columns]) }} AS metric_hour
 
 FROM {{ relation }}
 {%- if not loop.last %}
