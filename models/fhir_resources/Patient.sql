@@ -18,9 +18,10 @@
     name = "Patient",
     meta = {
       "description": "View of Patient FHIR resource",
-      "fhir_resource": "Patient"
-      },
-    materialized = 'view'
+      "fhir_resource": "Patient",
+      "metric_date_columns": None,
+      "patient_reference_column": None
+      }
 ) -}}
 
 {{ fhir_resource_view_expression() -}}

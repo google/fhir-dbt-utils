@@ -121,11 +121,6 @@ macros:
           set to True, the macro will unnest this field. If this argument is not provided, the macro
           will determine whether the field in an array using the `field_is_array` macro. This
           argument only needs to be provided during testing.
-      - name: return_int
-        type: boolean
-        description: |
-          If set to True, the macro will return an integer flag for whether a code exists, rather
-          than the code or display value itself.
 
 
   - name: full_address

@@ -17,7 +17,6 @@
   code_system,
   fhir_resource=None,
   return_field='code',
-  return_int=False,
   is_array=None
 ) -%}
 
@@ -64,7 +63,7 @@
         field_name~'.coding.system' not in datatype_dict
       )
   -%}
-    {{ return(0) if return_int else return("'missing_or_invalid_codeableconcept_field: "~field_name~"'") }}
+    {{ return("'missing_or_invalid_codeableconcept_field: "~field_name~"'") }}
   {%- endif -%}
 
 
