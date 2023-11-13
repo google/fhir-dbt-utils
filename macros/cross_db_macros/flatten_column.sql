@@ -32,7 +32,7 @@
     {{ return ([]) }}
   {% endif %}
 
-  {% set tokens = _tokenize(column.data_type) %}
+  {% set tokens = fhir_dbt_utils._tokenize(column.data_type) %}
   {% set vars = { "state": EXPECT_DATA_TYPE } %}
   {% set path = [column.name + "."] %}
   {% set flat_columns = [] %}
