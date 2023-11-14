@@ -118,7 +118,7 @@
   {% for unused in range(0, dtype|length)
      if vars.rest|length > 0 %}
     {% set rest = vars.rest %}
-    {{ vars.update({ "token": rest[: find_first_of(rest, ",:>")] }) }}
+    {{ vars.update({ "token": rest[: fhir_dbt_utils.find_first_of(rest, ",:>")] }) }}
     {% for keyword in KEYWORDS %}
       {% if rest.startswith(keyword) %}
         {{ vars.update({ "token": keyword }) }}
