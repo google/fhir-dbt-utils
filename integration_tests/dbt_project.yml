@@ -18,14 +18,10 @@ require-dbt-version: '>=1.3.0'
 config-version: 2
 profile: 'fhir_dbt_utils'
 
-target-path: "{{ env_var('DBT_TARGET_PATH', 'target') }}"
 packages-install-path: "{{ env_var('DBT_PACKAGES_INSTALL_PATH', 'dbt_packages') }}"
-log-path: "{{ env_var('DBT_LOG_PATH', 'logs') }}"
 
 clean-targets:
-  - "{{ env_var('DBT_TARGET_PATH', 'target') }}"
   - "{{ env_var('DBT_PACKAGES_INSTALL_PATH', 'dbt_packages') }}"
-  - "{{ env_var('DBT_LOG_PATH', 'logs') }}"
 
 dispatch:
   - macro_namespace: 'fhir_dbt_utils'
