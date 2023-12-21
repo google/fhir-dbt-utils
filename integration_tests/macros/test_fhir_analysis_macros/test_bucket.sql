@@ -19,7 +19,7 @@
   {% endset %}
 
   {% set tests = {
-    'deafult_boundaries_array': {
+    'default_boundaries_array': {
       'test': fhir_dbt_utils.bucket(field="age"),
       'expect': '60 - 70'
     },

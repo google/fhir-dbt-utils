@@ -17,6 +17,8 @@
 {% macro run_unit_tests_cross_db() %}
 
     {# fhir_analysis_macros #}
+    {% do test_local_hour() %}
+    {% do test_local_date() %}
     {% do test_alive() %}
     {% do test_age() %}
 

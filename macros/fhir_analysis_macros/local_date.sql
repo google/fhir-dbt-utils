@@ -12,9 +12,7 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-{% macro local_date(date_column, date_column_data_type) -%}
-
-{%- set timezone = "'" ~ var('timezone_default') ~ "'" -%}
+{% macro local_date(date_column, date_column_data_type, timezone = var('timezone_default')) -%}
 
 {%- if date_column_data_type == 'TIMESTAMP' -%}
     {{ fhir_dbt_utils.date(

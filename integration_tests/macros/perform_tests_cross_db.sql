@@ -14,6 +14,8 @@
 
 {% macro perform_tests_cross_db(input_data, tests) %}
 
+  {%- set DEBUG = False -%}
+
   {# Write a SQL query to run each test over the input data #}
   {% set query %}
     SELECT
@@ -23,18 +25,22 @@
     FROM {{ fhir_dbt_utils.from_literals(input_data) }}
   {% endset %}
 
+  {%- if DEBUG %}{{ print("query: " ~ query) }}{% endif -%}
+
   {# Execute the SQL query and save the results in a dictionary  #}
   {% set query_result = dbt_utils.get_query_results_as_dict(query) %}
 
   {# For each result compare with the expected value defined in the test #}
   {% for test_name in tests -%}
+    {%- if DEBUG %}{{ print("test_name: " ~ test_name) }}{% endif -%}
     {% set value = query_result[test_name][0]%}
     {% set expected = tests[test_name].expect %}
     {% if value|string == expected|string %}
       {% do log("SUCCESSFUL UNIT TEST:" ~ test_name ~ ".") %}
     {% else %}
       {% do exceptions.raise_compiler_error(
-        "FAILED UNIT TEST: " ~ test_name ~ ". Expected: " ~ expected ~ ". Returned: " ~ value ~ "."
+        "FAILED UNIT TEST: " ~ test_name ~ ". Expected: " ~ expected ~ ". Returned: " ~ value ~ ". "
+        ~ "Query: " ~ query ~ "."
       ) %}
     {% endif %}
   {% endfor %}

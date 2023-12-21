@@ -12,16 +12,16 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-{% macro date(expression, timezone=None) -%}
+{% macro date(expression, timezone  = var('timezone_default')) -%}
   {{ return(adapter.dispatch('date', 'fhir_dbt_utils') (expression, timezone)) }}
 {%- endmacro %}
 
 
 {% macro default__date(expression, timezone) -%}
-  DATE({{ expression }}, {{ timezone }})
+  DATE({{ expression }}, '{{ timezone }}')
 {%- endmacro %}
 
 
 {% macro spark__date(expression, timezone) -%}
-  DATE({{ expression }})
+  DATE({{ dbt_date.convert_timezone(expression, timezone) }})
 {%- endmacro %}

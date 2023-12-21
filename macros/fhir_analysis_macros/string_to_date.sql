@@ -35,7 +35,7 @@
     {{ fhir_dbt_utils.safe_cast_as_date(date_field) }},
     {{ fhir_dbt_utils.date(
       fhir_dbt_utils.safe_cast_as_timestamp(date_field),
-      "'" ~ timezone ~ "'")|indent(8) }}
+      timezone)|indent(8) }}
   )
 
 {%- endmacro -%}
