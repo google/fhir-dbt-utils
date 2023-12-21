@@ -15,8 +15,8 @@
 # limitations under the License.
 
 
-# Fail on any error.
-set -e
+set -e # Fail on errors.
+set -x # Show each command.
 
 # Run with integration_tests project configuration.
 cd integration_tests
@@ -28,8 +28,8 @@ dbt --version
 dbt deps
 
 # Run all macro unit tests.
-echo "Running dbt run-operation run_unit_tests"
-dbt run-operation run_unit_tests
+dbt run-operation run_unit_tests_cross_db
+dbt run-operation run_unit_tests_bigquery
 echo "SUCCESS: All tests are passing."
 
 # Remove artifacts on completion.

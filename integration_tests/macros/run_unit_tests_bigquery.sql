@@ -14,7 +14,7 @@
 
 -- Run using: dbt run-operation run_unit_tests
 
-{% macro run_unit_tests() %}
+{% macro run_unit_tests_bigquery() %}
 
     {# fhir_analysis_macros #}
     {% do test_age() %}
@@ -23,12 +23,10 @@
     {% do test_official_name() %}
     {% do test_identifier() %}
     {% do test_full_address() %}
-    {% do test_alive() %}
     {% do test_code_from_codeableconcept() %}
     {% do test_value_from_component() %}
     {% do test_has_value() %}
     {% do test_string_to_date() %}
-
 
     {# string_macros #}
     {% do test_quote_array() %}

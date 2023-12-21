@@ -16,11 +16,10 @@
 
   {# Scenario 1 - deceasedDateTime has a value #}
 
-  {% set input_data %}
-    STRUCT(
-      "2022-09-01T22:35:00+00:00" AS `dateTime`
-    ) as `deceased`
-  {% endset %}
+  {% set input_data = {
+    'deceased' : fhir_dbt_utils.named_struct({
+      'dateTime': '"2022-09-01T22:35:00+00:00"'})
+  } %}
 
   {% set tests = {
     'default_args': {
@@ -33,17 +32,16 @@
     }
   } %}
 
-  {{ perform_tests(input_data, tests) }}
+  {{ perform_tests_cross_db(input_data, tests) }}
 
 
   {# Scenario 2 - deceasedDateTime is null #}
 
-  {% set input_data %}
-    STRUCT(
-      FALSE AS `boolean`,
-      CAST(NULL AS STRING) AS `dateTime`
-    ) as `deceased`
-  {% endset %}
+  {% set input_data = {
+    'deceased' : fhir_dbt_utils.named_struct({
+      'boolean': 'FALSE',
+      'dateTime': 'CAST(NULL AS STRING)'})
+  } %}
 
   {% set tests = {
     'default_args_datetime_null': {
@@ -56,6 +54,6 @@
     }
   } %}
 
-  {{ perform_tests(input_data, tests) }}
+  {{ perform_tests_cross_db(input_data, tests) }}
 
 {% endmacro %}
