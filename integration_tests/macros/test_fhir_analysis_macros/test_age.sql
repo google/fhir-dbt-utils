@@ -16,9 +16,9 @@
 
   {# Scenario 1 - default date_of_birth_field #}
 
-  {% set input_data %}
-    "1950-01-01" AS `birthDate`
-  {% endset %}
+  {% set input_data = {
+    'birthDate': '"1950-01-01"'
+  } %}
 
   {% set tests = {
     'default_date_of_birth_field': {
@@ -27,14 +27,14 @@
     }
   } %}
 
-  {{ perform_tests(input_data, tests) }}
+  {{ perform_tests_cross_db(input_data, tests) }}
 
 
   {# Scenario 2 - date_of_birth_field specified #}
 
-  {% set input_data %}
-    "1970-01-01" AS `dob`
-  {% endset %}
+  {% set input_data = {
+    'dob': '"1970-01-01"'
+  } %}
 
   {% set tests = {
     'set_date_of_birth_field': {
@@ -45,5 +45,7 @@
       'expect': 53
     }
   } %}
+
+  {{ perform_tests_cross_db(input_data, tests) }}
 
 {% endmacro %}

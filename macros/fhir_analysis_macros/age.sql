@@ -28,6 +28,6 @@
 
   {%- set snapshot_date = fhir_dbt_utils.get_snapshot_date(snapshot_date) -%}
 
-  DATE_DIFF({{snapshot_date}}, DATE({{date_of_birth_field}}), YEAR) - IF(EXTRACT(DAYOFYEAR FROM DATE({{date_of_birth_field}})) > EXTRACT(DAYOFYEAR FROM DATE({{snapshot_date}})), 1, 0)
+  {{ dbt.datediff('DATE('~date_of_birth_field~')', snapshot_date, 'year') }} - IF({{ dbt_date.day_of_year('DATE('~date_of_birth_field~')') }} > {{ dbt_date.day_of_year('DATE('~snapshot_date~')') }}, 1, 0)
 
 {%- endmacro -%}

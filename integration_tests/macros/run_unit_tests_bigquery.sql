@@ -17,7 +17,6 @@
 {% macro run_unit_tests_bigquery() %}
 
     {# fhir_analysis_macros #}
-    {% do test_age() %}
     {% do test_bucket() %}
     {% do test_length_of_stay() %}
     {% do test_official_name() %}

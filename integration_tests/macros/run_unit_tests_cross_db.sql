@@ -18,5 +18,6 @@
 
     {# fhir_analysis_macros #}
     {% do test_alive() %}
+    {% do test_age() %}
 
 {% endmacro %}
