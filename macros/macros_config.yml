@@ -403,6 +403,10 @@ macros:
 
           If not specified, the macro will default to using the `primary_resource` specified in the
           model metadata.
+      - name: from_source_data
+        type: boolean
+        description: |
+          True to read the columns from the source data, false to read from FHIR resource view.
 
 
   - name: get_dbt_objects
