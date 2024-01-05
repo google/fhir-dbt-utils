@@ -71,7 +71,11 @@ SELECT
       creation_time DESC
   ), 1, 0) AS latest_version,
   {%- else %}
-  REPLACE(INITCAP(table_name), '_', '') AS fhir_resource,
+  {%- if var('snake_case_fhir_tables') -%}
+    REPLACE(INITCAP(table_name), '_', '') AS fhir_resource,
+  {%- else %}
+    table_name AS fhir_resource,
+  {%- endif %}
   NULL AS map_name,
   1 AS latest_version,
   {%- endif -%}

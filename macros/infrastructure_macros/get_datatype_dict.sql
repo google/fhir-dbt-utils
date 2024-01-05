@@ -12,7 +12,7 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
-{% macro get_datatype_dict(fhir_resource) %}
+{% macro get_datatype_dict(fhir_resource, database=target.project, schema=target.schema) %}
 
 {#- Validate input arguments -#}
 
@@ -26,15 +26,11 @@
   {%- if execute -%}
 
     {%- set relation = adapter.get_relation(
-          database = target.project,
-          schema = target.schema,
-          identifier = fhir_resource
-        )
-    -%}
+          database = database, schema = schema, identifier = fhir_resource) -%}
 
     {% if not relation %}
-      {% do exceptions.warn("Relation not found for: " ~ fhir_resource) %}
-      {% do return ({}) %}
+      {% do exceptions.raise_compiler_error(
+           "Table not found: " ~ fhir_resource ~ ", database " ~ database ~ ", schema " ~ schema) %}
     {% endif %}
 
     {%- set column_dict = {} -%}

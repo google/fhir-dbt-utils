@@ -45,7 +45,7 @@ FROM {{fhir_table}}
     {{ return(fhir_dbt_utils.build_union_query(fhir_tables)) }}
 {%- else %}
     {%- set metric_date_columns = fhir_dbt_utils.get_metric_date_columns() -%}
-    {%- set datatype_dict = fhir_dbt_utils.get_datatype_dict(fhir_resource) -%}
+    {%- set datatype_dict = fhir_dbt_utils.get_datatype_dict(fhir_resource, database = var('database'), schema = var('schema')) -%}
     {%- set date_column_data_type = datatype_dict[metric_date_columns[0]] %}
 SELECT
     *,

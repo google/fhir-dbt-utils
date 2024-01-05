@@ -31,14 +31,9 @@
     {% set meta_value = model.config.meta[meta_key] %}
 
     {% if not meta_value %}
-
-      {%- do exceptions.warn("Value not found for key in model metadata") -%}
       {%- do return(value_if_missing) -%}
-
     {% else %}
-
       {% do return(meta_value) %}
-
     {% endif %}
 
   {% endif %}
