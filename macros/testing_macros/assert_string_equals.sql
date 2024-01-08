@@ -12,19 +12,16 @@
 -- See the License for the specific language governing permissions and
 -- limitations under the License.
 
--- Run using: dbt run-operation run_unit_tests
-
-{% macro run_unit_tests_bigquery() %}
-
-    {# fhir_analysis_macros #}
-    {% do test_bucket() %}
-    {% do test_length_of_stay() %}
-    {% do test_official_name() %}
-    {% do test_identifier() %}
-    {% do test_full_address() %}
-    {% do test_code_from_codeableconcept() %}
-    {% do test_value_from_component() %}
-    {% do test_has_value() %}
-    {% do test_string_to_date() %}
-
+{% macro assert_string_equals(x, y) %}
+  {% set vars = {'pointer': ''} %}
+  {% for c in x %}
+    {% set pos = loop.index - 1 %}
+    {% if y[pos] != c %}
+      {{ exceptions.raise_compiler_error(
+        "strings differ at character "~pos~" '"~c~"'<>'"~y[pos]~"'\n"
+        ~x.replace("\n", "\\n")~" <>\n"~y.replace("\n", "\\n")~"\n"~vars.pointer~"^") }}
+    {% endif %}
+    # Add two spaces for \n, one space otherwise.
+    {{ vars.update({ 'pointer': vars.pointer ~ ('  ' if c == '\n' else ' ') }) }}
+  {% endfor %}
 {% endmacro %}

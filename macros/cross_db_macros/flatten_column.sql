@@ -87,9 +87,11 @@
         {% set data_type = "ARRAY<" + data_type + ">" %}
       {% endif %}
 
-      {{ flat_columns.append({
-          "name": full_name,
-          "data_type": data_type}) }}
+      {% if data_type != "STRUCT" %}
+        {{ flat_columns.append({
+            "name": full_name,
+            "data_type": data_type}) }}
+      {% endif %}
 
       {% if data_type == token %}
         {{ path.pop() }}

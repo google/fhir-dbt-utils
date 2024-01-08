@@ -14,10 +14,10 @@
 
 {% macro test_snake_case_to_proper_case() %}
 
-  {% set input_data %}
-    "foo" AS `foo`,
-    "foo_bar" AS `foo_bar`
-  {% endset %}
+  {% set input_data = {
+    'foo': '"foo"',
+    'foo_bar': '"foo_bar"'
+  } %}
 
   {% set tests = {
     'lower_case': {
@@ -30,6 +30,6 @@
     }
   } %}
 
-  {{ perform_tests(input_data, tests) }}
+  {{ perform_tests_cross_db(input_data, tests) }}
 
 {% endmacro %}

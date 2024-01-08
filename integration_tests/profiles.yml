@@ -25,3 +25,14 @@ fhir_dbt_utils:
       project: "{{ env_var('DBT_PROJECT', 'unknown_project') }}"
       threads: 16
       type: bigquery
+    local_spark:
+      type: spark
+      method: thrift
+      host: localhost
+      port: 10000
+      user:
+      schema: "{{ env_var('USER', 'unknown_user') }}_dbt"
+      connect_retries: 0
+      connect_timeout: 60
+      retry_all: true
+      threads: 16

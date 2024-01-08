@@ -16,10 +16,22 @@
 
 {% macro run_unit_tests_cross_db() %}
 
+    {# cross_db_macros #}
+    {% do test_flatten_column() %}
+    {% do test_unnest() %}
+    {% do test_unnest_multiple() %}
+    {% do test_select_from_unnest() %}
+
     {# fhir_analysis_macros #}
     {% do test_local_hour() %}
     {% do test_local_date() %}
     {% do test_alive() %}
     {% do test_age() %}
+
+    {# string_macros #}
+    {% do test_quote_array() %}
+    {% do test_find_first_of() %}
+    {% do test_camel_case_to_snake_case() %}
+    {% do test_snake_case_to_proper_case() %}
 
 {% endmacro %}
