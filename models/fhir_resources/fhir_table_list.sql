@@ -49,7 +49,8 @@ SELECT
   NULL as bq_dataset,
   '{{ table_name }}' as bq_table,
   '`{{ var('schema') }}`.`{{ table_name }}`' AS fully_qualified_bq_table,
-  NULL AS creation_time
+  NULL AS creation_time,
+  1 AS latest_version
     {% if not loop.last %}UNION ALL{% endif %}
   {% endfor %}
 
